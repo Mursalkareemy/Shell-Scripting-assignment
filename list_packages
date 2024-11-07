@@ -1,0 +1,23 @@
+#!/bin/bash
+# This script creates packages_list.txt with a list of packages to install
+
+# Function to write the package names to packages_list.txt
+install_packages_list() {
+    echo "Creating packages_list.txt with required packages..."
+
+    # Using a here document to add package names directly to the file
+    cat <<EOL > packages_list.txt
+kakoune
+tmux
+EOL
+
+    # Display the contents of the file to confirm
+    echo "Package list created successfully! Contents:"
+    cat packages_list.txt
+}
+
+# Run the function
+install_packages_list
+
+# RESOURCE: https://tldp.org/LDP/abs/html/here-docs.html
+# Bash Input and Output Redirection - Ryan's Tutorials

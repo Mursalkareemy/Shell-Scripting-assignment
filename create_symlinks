@@ -1,0 +1,35 @@
+#!/bin/bash
+# This script creates symbolic links for configuration files
+
+# Function to set up symbolic links
+create_symlinks() {
+    echo "Setting up symbolic links for configuration files..."
+
+    # Associative array where each key is a source file and each value is the destination
+    declare -A links=(
+        ["./config_files/bashrc"]="$HOME/.bashrc"
+        ["./config_files/kakrc"]="$HOME/.config/kak/kakrc"
+        ["./config_files/tmux.conf"]="$HOME/.config/tmux/tmux.conf"
+    )
+
+    # Loop through each item in the associative array
+    for src in "${!links[@]}"; do
+        # Get the destination path for the current source file
+        dest="${links[$src]}"
+        
+        # Create the directory for the destination if it doesn't already exist
+        mkdir -p "$(dirname "$dest")"
+
+        # Create the symbolic link, forcing (-f) replacement if a link already exists
+        ln -sf "$src" "$dest"
+        echo "Linked $src to $dest"
+    done
+
+    echo "All symbolic links created successfully."
+}
+
+# Call the function to create symlinks
+create_symlinks
+
+
+#References: Using Associative Arrays in Bash - Linux Hint, How to Create Symbolic Links in Linux - Linuxize, mkdir Command in Linux - GeeksforGeeks

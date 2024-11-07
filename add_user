@@ -1,0 +1,70 @@
+#!/bin/bash
+# This script automates the process of adding a new user with specified options
+
+# Function to check if the script is running as root
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        echo "Error: This script must be run as root."
+        exit 1
+    fi
+}
+
+# Function to display usage information
+show_usage() {
+    echo "Usage: $0 -u username -s shell -g additional_groups"
+    echo "  -u   Specify the username for the new user"
+    echo "  -s   Specify the shell for the new user (e.g., /bin/bash)"
+    echo "  -g   Specify additional groups (comma-separated, no spaces)"
+}
+
+# Parse command-line options using getopts
+while getopts "u:s:g:" opt; do
+    case "$opt" in
+        u) username=$OPTARG ;;     # Set the username
+        s) shell=$OPTARG ;;        # Set the specified shell
+        g) groups=$OPTARG ;;       # Set the additional groups
+        *) show_usage               # Display usage information for invalid options
+           exit 1 ;;
+    esac
+done
+
+# Check if the required username option is provided
+if [[ -z "$username" ]]; then
+    echo "Error: Username is required."
+    show_usage
+    exit 1
+fi
+
+# Set default shell if not provided
+if [[ -z "$shell" ]]; then
+    shell="/bin/bash"
+    echo "Shell not specified. Using default shell: $shell"
+fi
+
+# Function to add the user with specified settings
+create_user() {
+    echo "Creating user '$username' with shell '$shell' and groups '$groups'..."
+
+    # Add the user with the specified shell and groups
+    if useradd -m -s "$shell" -G "$groups" "$username"; then
+        echo "User '$username' created successfully."
+        
+        # Set a password for the user
+        echo "Please enter a password for the new user:"
+        passwd "$username"
+
+        # Copy default files to the new user's home directory
+        cp -r /etc/skel/. "/home/$username"
+        chown -R "$username":"$username" "/home/$username"
+        echo "Home directory and default files set up for '$username'."
+    else
+        echo "Error: Failed to create user '$username'."
+        exit 1
+    fi
+}
+
+# Run the root check, then create the user
+check_root
+create_user
+
+#Reference: Writing Bash Functions-Linuxize, Using conditional statement in bash- Ryan's Tutorials

@@ -1,0 +1,31 @@
+#!/bin/bash
+# This script runs the setup tasks in sequence by calling other scripts
+
+# Function to check if packages_list.txt exists
+ensure_package_list() {
+    # If packages_list.txt does not exist, run list_packages.sh to create it
+    if [[ ! -f packages_list.txt ]]; then
+        echo "packages_list.txt not found. Running list_packages.sh to create it..."
+        ./list_packages.sh
+    fi
+}
+
+# Function to run the installation and symlink creation scripts
+run_setup() {
+    echo "Starting the setup process..."
+
+    # Run the install_packages.sh script to install the packages
+    ./install_packages
+
+    # Run the create_symlinks.sh script to create symbolic links
+    ./create_symlinks
+
+    echo "Setup process completed successfully!"
+}
+
+# Run functions in the proper order
+ensure_package_list  # Make sure packages_list.txt exists
+run_setup            # Run installation and symlink scripts
+
+
+# Reference: https://stackoverflow.com/questions/8352851/how-to-call-one-shell-script-from-another-shell-script
